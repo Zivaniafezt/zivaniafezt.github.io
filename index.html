@@ -20,21 +20,26 @@
     <style>
         *{
             font-family: 'Ubuntu',sans-serif;
+            
         }
         img{
             max-height: 30vh;
             border-radius: 50%;
+        
             
-
         }
+        
     </style>
 </head>
+
 <body>
     <header>
-        <h1>Zivaniafezt' Personal Website.</h1>
+       
+        <h1 id="discordInfo"></h1>  
+        
     </header>
     <main>
-        <img tittle="my mascot" src="https://cdn.jsdelivr.net/gh/Zivaniafezt/zivaniafezt.github.io@main/bateman.jpg">
+        <img id="AvatarImage" title="my mascot" src="https://cdn.jsdelivr.net/gh/Zivaniafezt/zivaniafezt.github.io@main/bateman.jpg">
         <h2>About me🤨</h2>
         <blockquote>
             <b>GameDesigner with nothing to design.</b><br>
@@ -43,7 +48,7 @@
                 <a href="https://youtu.be/dQw4w9WgXcQ?si=ZdPgnSNiKZOoWfGy">Contact me through email.</a>
             </nav>
         </blockquote>
-
+<p?
         <h3>my project list📝</h3>
         <blockquote>
             <b>an adventure into coding.</b><br>
@@ -54,4 +59,63 @@
         </blockquote>
     </main>
 </body>
+<script> 
+
+const AvatarImage = document.getElementById("AvatarImage");
+const APIurl = "https://api.lanyard.rest/v1/users/1076080966826733612"
+fetchinfo();
+let refreshInfo = setInterval(() => {
+    fetchinfo();
+}, 30000);
+ // Function to fetch Discord username
+ async function getDiscordInfo() {
+            try {
+                const response = await fetch('https://api.lanyard.rest/v1/users/1076080966826733612');
+                const data = await response.json();
+                const statusEmoji = getStatusEmoji(data);
+                const username = data.data.discord_user.username;
+                document.getElementById('discordInfo').innerHTML = `<span>${statusEmoji}</span> ${username}' Personal Website`;
+            } catch (error) {
+                console.error('Error fetching Discord information:', error);
+            }
+        }
+
+        // Function to get status emoji based on Lanyard data
+        function getStatusEmoji(data) {
+            if (data.data.discord_status === 'online') {
+                return '🟢';
+            } else if (data.data.discord_status === 'idle') {
+                return '🟡';
+            } else if (data.data.discord_status === 'dnd') {
+                return '🔴';
+            } else {
+                return '⚫️';
+            }
+        }
+
+        // Call the function when the page loads
+        window.onload = getDiscordInfo;
+
+function fetchinfo() {
+    fetch(APIurl)
+    .then((raw) => raw.json())
+    .then((data)=> {
+        const discordinfo = data["data"] ?? null;
+        if(!discordinfo) return;
+
+        if(discordinfo["discord_user"]["id"]
+        &&discordinfo["discord_user"]["avatar"]){
+            AvatarImage.src = `https://cdn.discordapp.com/avatars/${discordinfo["discord_user"]["id"]}/${discordinfo["discord_user"]["avatar"]}?format=webp&size=512`;
+            
+        }
+    
+
+       
+
+    
+
+    });
+
+}
+</script>
 </html>
