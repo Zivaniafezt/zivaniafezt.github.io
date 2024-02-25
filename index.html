@@ -35,8 +35,9 @@
 <body>
     <header>
        
-        <h1 id="discordInfo"></h1>  
-        
+        <h1 id="HeaderWebsite">zivaniafezt Personal Website.</h1>
+        <h3 id="myStatus" style="display: table;"></h3>
+
     </header>
     <main>
         <img id="AvatarImage" title="my mascot" src="https://cdn.jsdelivr.net/gh/Zivaniafezt/zivaniafezt.github.io@main/bateman.jpg">
@@ -62,60 +63,72 @@
 <script> 
 
 const AvatarImage = document.getElementById("AvatarImage");
-const APIurl = "https://api.lanyard.rest/v1/users/1076080966826733612"
-fetchinfo();
-let refreshInfo = setInterval(() => {
-    fetchinfo();
-}, 30000);
- // Function to fetch Discord username
- async function getDiscordInfo() {
-            try {
-                const response = await fetch('https://api.lanyard.rest/v1/users/1076080966826733612');
-                const data = await response.json();
-                const statusEmoji = getStatusEmoji(data);
-                const username = data.data.discord_user.username;
-                document.getElementById('discordInfo').innerHTML = `<span>${statusEmoji}</span> ${username}' Personal Website`;
-            } catch (error) {
-                console.error('Error fetching Discord information:', error);
-            }
-        }
+    const HeaderWebsite = document.getElementById("HeaderWebsite");
+    const customstatus= document.getElementById("customstatus");
+    const Headerdevice= document.getElementById("Headerdevice");
 
-        // Function to get status emoji based on Lanyard data
-        function getStatusEmoji(data) {
-            if (data.data.discord_status === 'online') {
-                return '🟢';
-            } else if (data.data.discord_status === 'idle') {
-                return '🟡';
-            } else if (data.data.discord_status === 'dnd') {
-                return '🔴';
-            } else {
-                return '⚫️';
-            }
-        }
+    //API
+    const APIurl = "https://api.lanyard.rest/v1/users/1076080966826733612";
 
-        // Call the function when the page loads
-        window.onload = getDiscordInfo;
+    fetchInfo();
+    let refreshInfo = setInterval(() => {
+        fetchInfo();
+    }, 30000);
 
-function fetchinfo() {
-    fetch(APIurl)
-    .then((raw) => raw.json())
-    .then((data)=> {
-        const discordinfo = data["data"] ?? null;
-        if(!discordinfo) return;
+    function fetchInfo() {
+        fetch(APIurl)
+            .then((raw) => raw.json())
+            .then((data) => {
+                const discordInfo = data["data"] ?? null;
+                if(!discordInfo) return;
 
-        if(discordinfo["discord_user"]["id"]
-        &&discordinfo["discord_user"]["avatar"]){
-            AvatarImage.src = `https://cdn.discordapp.com/avatars/${discordinfo["discord_user"]["id"]}/${discordinfo["discord_user"]["avatar"]}?format=webp&size=512`;
-            
-        }
-    
+                let statusRN = "";
+                let deviceRN = "";
 
-       
+                if(discordInfo["discord_status"] && discordInfo["discord_user"]["display_name"]) {
+                    switch(discordInfo["discord_status"]) {
+                        case "online":
+                            statusRN = "🟢";
+                            break;
+                        case "idle":
+                            statusRN = "🟡";
+                            break;
+                        case "dnd":
+                            statusRN = "🔴";
+                            break;
+                        case "offline":
+                            statusRN = "⚪";
+                            break;
+                        default:
+                            statusRN = "";
+                    }
+                }
 
-    
+                if(discordInfo["active_on_discord_web"]) deviceRN = "🌐";
+                if(discordInfo["active_on_discord_desktop"]) deviceRN = "🖥️";
+                if(discordInfo["active_on_discord_mobile"]) deviceRN = "📱";
 
-    });
+                HeaderWebsite.innerText = statusRN + deviceRN + `${statusRN.length > 0 || deviceRN.length > 0 ? " " : ""}` + discordInfo["discord_user"]["display_name"] + " Personal Website.";
 
-}
+                const customStatus = discordInfo["activities"].filter((activity) => activity.type === 4);
+                if(customStatus.length > 0) {
+                    myStatus.innerText = customStatus[0]["state"];
+                    myStatus.style.display = "block";
+                }
+
+              
+
+
+                if(discordInfo["discord_user"]["id"]
+                && discordInfo["discord_user"]["avatar"]) {
+                    AvatarImage.src = `https://cdn.discordapp.com/avatars/${discordInfo["discord_user"]["id"]}/${discordInfo["discord_user"]["avatar"]}?format=webp&size=512`;
+                }
+
+                
+ 
+                    
+                
+            });
+    }
 </script>
 </html>
